@@ -1,0 +1,250 @@
+static int[,] GetSudoku()
+{
+	int[,] Sudoku = new int[9,9];
+	Console.WriteLine("Please enter a if you want the solver to solve a default easy sudoku");
+	Console.WriteLine("Please enter b if you want the solver to fail to solve a default medium sudoku");
+	Console.WriteLine("Please enter c if you want to define your own sudoku.");
+	
+	string choice;
+	
+	do
+	{
+	choice = Console.ReadLine();
+	if (choice != "a" && choice != "b" && choice != "c")
+		{
+		Console.WriteLine("You have entered an invalid option. Please try again.");
+		}
+	
+	} while (choice != "a" && choice != "b" && choice != "c");
+	
+	Console.WriteLine($"You have selected {choice}.");
+		
+	
+	switch (choice)
+      	{
+          case "a":
+    			Sudoku = new int[,]        
+				{
+					{2,0,9,7,0,0,5,0,0},
+			     	{0,0,4,0,9,0,1,0,0},
+			     	{0,8,0,0,3,0,4,7,0},
+			    	{0,2,6,0,0,1,3,0,5},
+			    	{0,5,0,0,0,0,0,2,0},
+			    	{4,0,3,0,5,0,0,9,1},
+			    	{0,0,7,0,0,3,0,5,0},
+			    	{3,0,2,0,1,5,0,8,7},
+			    	{5,0,8,4,2,7,9,0,0}
+				};
+              break;
+			  
+          case "b":
+				Sudoku = new int[,] 
+				{
+					{0,0,0,7,0,3,0,2,0},
+			     	{0,3,0,2,0,6,0,0,4},
+			     	{1,0,0,0,8,0,0,0,6},
+			    	{0,0,0,8,0,0,0,5,2},
+			    	{0,0,9,0,3,0,6,0,0},
+			    	{5,7,0,0,0,9,0,0,0},
+			    	{2,0,0,0,7,0,0,0,8},
+			    	{4,0,0,6,0,5,0,7,0},
+			    	{0,5,0,3,0,8,0,0,0}
+				};
+              break;
+			  
+          default:
+		  		Console.WriteLine("The sudoku is to be entered row by row starting in the top left and finishing in the bottom right. Please use 0 to represent a blank space.");
+              for (int j = 0; j<=8; j++)
+				{
+				for (int i = 0; i<=8; i++)
+				{
+				Console.WriteLine($"Please key in number index ({j+1},{i+1}) and press enter.");
+				Sudoku[j,i] = Convert.ToInt32(Console.ReadLine());
+				}
+				}
+              break;
+		}
+			
+				
+	Console.WriteLine("Thank you friend. The soduku to be solved is:");
+	for (int j = 0; j<=8; j++)
+	{
+		for (int i = 0; i<=8; i++)
+		{
+		Console.Write(Sudoku[j,i]);
+		}
+		Console.WriteLine();
+	}
+
+
+return Sudoku;
+}
+
+
+void Main()
+{
+	int[,] sudoku = GetSudoku(); //Gets a sudoku from the user, or uses a default.
+	
+
+	int iterations = 0;
+	bool solved = false;
+	
+	while (solved == false && iterations < 81)
+	{
+	
+	solved = true; //assume it's solved until we find a zero element
+	
+	for (int y = 0; y <= 8; y++)
+	{
+		for (int x = 0; x <= 8; x++)
+		{
+		
+		if (sudoku[y,x] == 0)
+			{
+			solved = false; //it's not solved yet as there is a 0 present in the array
+			//DEFINE BOXES
+			int[] box1 = {sudoku[0,0], sudoku[0,1], sudoku[0,2], sudoku[1,0], sudoku[1,1], sudoku[1,2], sudoku[2,0], sudoku[2,1], sudoku[2,2]};
+			int[] box2 = {sudoku[0,3], sudoku[0,4], sudoku[0,5], sudoku[1,3], sudoku[1,4], sudoku[1,5], sudoku[2,3], sudoku[2,4], sudoku[2,5]};
+			int[] box3 = {sudoku[0,6], sudoku[0,7], sudoku[0,8], sudoku[1,6], sudoku[1,7], sudoku[1,8], sudoku[2,6], sudoku[2,7], sudoku[2,8]};
+			int[] box4 = {sudoku[3,0], sudoku[3,1], sudoku[3,2], sudoku[4,0], sudoku[4,1], sudoku[4,2], sudoku[5,0], sudoku[5,1], sudoku[5,2]};
+			int[] box5 = {sudoku[3,3], sudoku[3,4], sudoku[3,5], sudoku[4,3], sudoku[4,4], sudoku[4,5], sudoku[5,3], sudoku[5,4], sudoku[5,5]};
+			int[] box6 = {sudoku[3,6], sudoku[3,7], sudoku[3,8], sudoku[4,6], sudoku[4,7], sudoku[4,8], sudoku[5,6], sudoku[5,7], sudoku[5,8]};
+			int[] box7 = {sudoku[6,0], sudoku[6,1], sudoku[6,2], sudoku[7,0], sudoku[7,1], sudoku[7,2], sudoku[8,0], sudoku[8,1], sudoku[8,2]};
+			int[] box8 = {sudoku[6,3], sudoku[6,4], sudoku[6,5], sudoku[7,3], sudoku[7,4], sudoku[7,5], sudoku[8,3], sudoku[8,4], sudoku[8,5]};
+			int[] box9 = {sudoku[6,6], sudoku[6,7], sudoku[6,8], sudoku[7,6], sudoku[7,7], sudoku[7,8], sudoku[8,6], sudoku[8,7], sudoku[8,8]};
+			
+			
+			
+			int[] row = sudoku.GetRow(y);
+			int[] column = sudoku.GetColumn(x);
+			int[] thisbox;
+			
+			//SWITCH STATEMENT TO SELECT THE RELEVANT BOX
+			switch (y)
+      		{
+          	case 0: case 1: case 2:
+			//TOP ROW OF BOXES
+              	switch (x)
+			  	{
+          		case 0: case 1: case 2:
+				thisbox = box1;			  
+              	break;
+			  
+          		case 3: case 4: case 5:
+            	thisbox = box2;
+				break;
+          		
+				default:
+            	thisbox = box3;		
+              	break;
+				}
+            break;
+			  
+          	case 3: case 4: case 5:
+            //MIDDLE ROW OF BOXES
+			switch (x)
+			  	{
+          		case 0: case 1: case 2:
+				thisbox = box4;			  
+              	break;
+			  
+          		case 3: case 4: case 5:
+            	thisbox = box5;
+				break;
+          		
+				default:
+            	thisbox = box6;			
+              	break;
+				}
+            break;
+			  
+          	default:
+            //BOTTOM ROW OF BOXES
+			switch (x)
+			  	{
+          		case 0: case 1: case 2:
+				thisbox = box7;			  
+              	break;
+			  
+          		case 3: case 4: case 5:
+            	thisbox = box8;
+				break;
+          		
+				default:
+            	thisbox = box9;			
+              	break;
+				}
+            break;
+			}
+			
+			//DEFINE OPTIONS ARRAY
+			int[] options = {1,2,3,4,5,6,7,8,9};
+				
+		
+			for (int j = 1; j <= 9; j++)
+			{
+				if (
+					Array.Exists(row, element => element == j) || //if there is a j in row...
+					Array.Exists(column, element => element == j) || //or the column...
+					Array.Exists(thisbox, element => element == j) //or the box...
+					) 
+				{
+					options[j-1] = 0; //delete the j from options
+				}
+				
+			}
+
+			if (options.Count(value => value != 0) == 1) //if there is only one non zero option
+			sudoku[y,x] = options.FirstOrDefault(value => value != 0); //replace the zero value in the sudoku with the remaining option
+		
+		}	
+		}
+		}
+		
+		iterations++;
+		}
+
+
+		Console.WriteLine(" ");
+		if (solved == true)
+		{
+		Console.WriteLine($"The sudoku has been solved in {iterations} iterations!");
+		}
+		else
+		{
+		Console.WriteLine("After a full 81 iterations the program was unable to solve the sudoku :^(");
+		Console.WriteLine("This is as far as it got:");
+		}
+		for (int j = 0; j<=8; j++)
+		{
+		for (int i = 0; i<=8; i++)
+		{
+		Console.Write(sudoku[j,i]);
+		}
+		Console.WriteLine();
+		}
+	
+	
+	
+
+}
+
+// You can define other methods, fields, classes and namespaces here
+
+public static class ArrayExtensions
+{
+	public static int[] GetColumn(this int[,] matrix, int columnNumber)
+	{
+		return Enumerable.Range(0, matrix.GetLength(0))
+			.Select(x => matrix[x, columnNumber])
+			.ToArray(); // .range.select.toarray applies the functions in order. It passes the output from function to function.
+	}
+	
+	public static int[] GetRow(this int[,] matrix, int rowNumber)
+	{
+		return Enumerable.Range(0, matrix.GetLength(0))
+			.Select(x => matrix[rowNumber, x])
+			.ToArray();
+	}
+	
+}
